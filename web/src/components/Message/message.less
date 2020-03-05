@@ -1,0 +1,31 @@
+.global-message {
+    position: fixed;
+    width: 100%;
+    top: 3rem;
+    left: 0;
+    text-align: center;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  .global-message-content {
+    display: inline-block;
+    font-size: 1.6rem;
+    padding: 0.6rem 1.2rem;
+    background: #fff;
+    border-radius: 0.2rem;
+    box-shadow: 0 0.1rem 0.5rem rgba(0, 0, 0, 0.4);
+    margin-bottom: 0.6rem;
+  }
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: all 0.3s ease;
+  }
+  .fade-enter,
+  .fade-leave-to {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+  .fade-leave-to {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }

@@ -1,0 +1,33 @@
+export default function(router){
+    router.push({
+        name:'home',
+        path:'/home',
+        component:()=>import('../../views/homePage/home.vue'),
+    }),
+    router.push({
+        name:'article',
+        path:'/article/:id',
+        props:true,
+        component:()=>import('../../views/homePage/article.vue'),
+    }),
+    router.push({
+        name:'archives',
+        path:'/archives',
+        component:()=>import('../../views/homePage/archives.vue'),
+    }),
+    router.push({
+        name:'about',
+        path:'/about',
+        component:()=>import('../../views/homePage/about.vue'),
+    }),
+    router.push({
+        name:'friends',
+        path:'/friends',
+        component:()=>import('../../views/homePage/friends.vue'),
+    }),
+    router.push({
+        name:'music',
+        path:'/music',
+        component:()=>import('../../views/homePage/music.vue'),
+    })
+}

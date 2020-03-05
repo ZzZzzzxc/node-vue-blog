@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+}
+img {
+  max-width: 100%;
+}
+/* rem布局设置 */
+@media (min-width: 1200px) {
+  html {
+    font-size: 14px;
+  }
+}
+@media (max-width: 1024px) and (min-width: 768px) {
+  html {
+    font-size: 11.9px;
+  }
+}
+@media (max-width: 767px) and (min-width: 414px) {
+  html {
+    font-size: 8.9px;
+  }
+}
+@media (max-width: 413px) and (min-width: 375px) {
+  html {
+    font-size: 4.83px;
+  }
+}
+@media (max-width: 374px) and (min-width: 320px) {
+  html {
+    font-size: 4.375px;
+  }
+}
+@media (max-width: 319px) {
+  html {
+    font-size: 3.72px;
+  }
+}
+
+.container {
+  margin: 0 5%;
+  width: 90%;
+}
+/* 滚动条 */
+/* 整体 */
+::-webkit-scrollbar {
+  width: 0.6rem;
+  height: 0.6rem;
+  background: transparent;
+  background: hsla(39, 94%, 50%, 0.2);
+}
+
+/* 滑块 */
+::-webkit-scrollbar-thumb {
+  background: hsla(39, 94%, 50%, 0.6);
+  border-radius: 4rem;
+}

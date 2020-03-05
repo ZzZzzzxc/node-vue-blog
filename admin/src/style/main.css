@@ -1,0 +1,18 @@
+.ant-table-title {
+  display: none;
+}
+
+/* 滚动条 */
+/* 整体 */
+*::-webkit-scrollbar {
+  width: 0.6rem;
+  height: 0.6rem;
+  background: transparent;
+  background: rgb(0, 0, 0,0.1);
+}
+
+/* 滑块 */
+*::-webkit-scrollbar-thumb {
+  background: rgb(0, 0, 0,0.3);
+  border-radius: 4rem;
+}

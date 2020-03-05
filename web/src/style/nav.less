@@ -1,0 +1,113 @@
+#nav-body {
+  z-index: 9;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 62px;
+  line-height: 62px;
+  background: rgba(138, 86, 86, 0);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  transition: 0.6s;
+  font-size: 20px;
+  #logo {
+    float: left;
+    color: black;
+    font-weight: bolder;
+  }
+  #nav-menu {
+    float: right;
+    margin: 0;
+    color: black;
+    li {
+      list-style: none;
+    }
+    li::before {
+      transition: 0.4s;
+      display: inline-block;
+      position: absolute;
+      bottom: 0;
+      width: 0;
+      height: 4px;
+      content: "";
+      background-color: #ffac5a;
+      opacity: 0;
+    }
+    .active {
+      color: #ffac5a;
+    }
+    li.active::before {
+      display: inline-block;
+      position: absolute;
+      bottom: 0;
+      width: 62px;
+      height: 5px;
+      content: "";
+      background-color: #ffac5a;
+      opacity: 1;
+    }
+  }
+  #nav-menu > li:hover {
+    cursor: pointer;
+    color: #ffac5a;
+  }
+}
+
+@media (min-width: 980px) {
+  #open-btn {
+    display: none;
+  }
+  #nav-menu > li {
+    float: left;
+    list-style: none;
+    user-select: none;
+    margin: 0 1rem;
+    font-weight: bolder;
+  }
+  #nav-menu-slide {
+    display: none;
+  }
+}
+@media (max-width: 979px) {
+  #open-btn {
+    user-select: none;
+    margin: 0 auto;
+    font-weight: bolder;
+    text-align: right;
+    float: right;
+    height: 62px;
+    line-height: 62px;
+  }
+  #nav-menu-slide {
+    z-index: 10;
+    background: hsla(39, 94%, 50%, 0.9);
+    right: -400px;
+    width: 200px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    transition: 0.4s;
+    font-size: 20px;
+    padding: 20px 0;
+  }
+  #nav-menu-slide > li {
+    user-select: none;
+    font-weight: bolder;
+    list-style: none;
+    border-bottom: none;
+    width: 100%;
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    color: white;
+  }
+  #nav-menu-slide > li:hover {
+    cursor: pointer;
+    color: red;
+  }
+  li.active::before{
+      display: none;
+  }
+}
