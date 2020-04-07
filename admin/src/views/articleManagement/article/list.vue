@@ -132,7 +132,7 @@ export default {
                 });
               },
               banner: data => {
-                return <img src={data.banner} style={"width:100%"} />;
+                return <img src={data.banner} style={"height:70px"} />;
               },
               title: data => {
                 return (

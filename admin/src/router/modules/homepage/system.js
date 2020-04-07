@@ -56,6 +56,32 @@ export default function(router) {
           )
       },
       {
+        path: "/system/file",
+        name: "file",
+        meta: {
+          icon: "file",
+          title: "文件管理",
+          authority: ["guest", "admin"]
+        },
+        component: () =>
+          import(
+            /* webpackChunkName: "system" */ "../../../views/systemManagement/fileManage/index.vue"
+          )
+      },
+      {
+        path: "/system/logo",
+        name: "logo",
+        meta: {
+          icon: "file",
+          title: "Logo管理",
+          authority: ["guest", "admin"]
+        },
+        component: () =>
+          import(
+            /* webpackChunkName: "system" */ "../../../views/systemManagement/logo/index.vue"
+          )
+      },
+      {
         path: "/system/about",
         name: "about",
         meta: { icon: "user", title: "关于我", authority: ["guest", "admin"] },

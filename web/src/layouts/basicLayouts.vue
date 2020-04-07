@@ -8,6 +8,7 @@
     </Content>
     <Footer />
     <BackToTop />
+    <MiniPlayer v-if="$route.path!='/music'" />
   </div>
 </template>
 <script>
@@ -15,17 +16,30 @@ import Nav from "./components/nav";
 import Footer from "./components/footer";
 import Content from "./components/content";
 import BackToTop from "../components/backToTop";
+import { getMusicList } from "../services/index";
+import { player } from "../components/musicPlayer/player";
+import MiniPlayer from '../components/musicPlayer/MiniPlayer'
 export default {
   name: "layout",
   components: {
     Nav,
     Footer,
     Content,
-    BackToTop
+    BackToTop,
+    MiniPlayer
   },
   data() {
     return {};
-  }
+  },
+  created() {
+    getMusicList()
+      .then(res => {
+        player.getList(res);
+      })
+      .catch(err => {
+        this.$Message.info({ content: err });
+      });
+  },
 };
 </script>
 <style scoped>

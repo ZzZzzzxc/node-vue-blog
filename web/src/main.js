@@ -25,6 +25,12 @@ Vue.use(VueLazyload, {
 //全局消息组件
 import Message from "./components/Message/index";
 Vue.prototype.$Message = Message;
+//加载中
+import loading from './components/loading/index.js'
+Vue.use(loading);
+//气泡框
+import popover from './components/popover/index.js'
+Vue.use(popover);
 //代码高亮
 import "highlight.js/styles/atom-one-dark.css";
 //svgIcon

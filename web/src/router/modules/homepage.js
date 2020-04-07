@@ -29,5 +29,10 @@ export default function(router){
         name:'music',
         path:'/music',
         component:()=>import('../../views/homePage/music.vue'),
+    }),
+    router.push({
+        name:'timeline',
+        path:'/timeline',
+        component:()=>import('../../views/homePage/timeline.vue'),
     })
 }

@@ -85,7 +85,8 @@ module.exports = {
       "vue-router": "VueRouter",
       axios: "axios",
       moment: "moment",
-      'mavon-editor': 'MavonEditor'
+      "mavon-editor": "MavonEditor",
+      echarts: "echarts"
     };
   }
 };

@@ -26,6 +26,10 @@ npm run serve
 ```
 
 第三方服务需要自行进行配置，修改一下key啊，id啊什么的就好了。
+/admin/.env.development 配置github登录重定向地址
+/admin/.env.production  配置github登录重定向地址
+/server-admin/plugins/githubLogin.js 配置github的id，密钥等
+/server-admin/plugins/qiniuConfig.js 配置七牛云的accessKey，secretKey
 
 后台管理第一次使用管理员权限需要配置github第三方登录，登录后即可添加账户。
 

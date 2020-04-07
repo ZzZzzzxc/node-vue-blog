@@ -7,11 +7,14 @@ import store from "./store";
 import moment from "moment";
 Vue.prototype.$moment = moment;
 
+const echarts = require("echarts");
+Vue.prototype.$echarts = echarts;
+
 import "normalize.css/normalize.css";
 
 import "./icons/index";
 
-import './style/main.css'
+import "./style/main.css";
 
 import {
   Button,
@@ -41,7 +44,9 @@ import {
   Spin,
   Avatar,
   Card,
-  Skeleton
+  Skeleton,
+  Tabs,
+  Progress
 } from "ant-design-vue";
 Vue.use(Button);
 Vue.use(Layout);
@@ -69,6 +74,8 @@ Vue.use(Spin);
 Vue.use(Avatar);
 Vue.use(Card);
 Vue.use(Skeleton);
+Vue.use(Tabs);
+Vue.use(Progress);
 Vue.prototype.$message = Message;
 Vue.prototype.$notification = Notification;
 Vue.prototype.$info = Modal.info;

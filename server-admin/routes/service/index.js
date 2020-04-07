@@ -39,9 +39,9 @@ module.exports = app => {
   app.post("/admin/api/upload", async (req, res) => {
     upload(req, res, function(err) {
       if (err instanceof multer.MulterError) {
-        assert(err, 500, "上传错误");
+        assert(!err, 500, "multer错误导致上传失败");
       } else if (err) {
-        assert(err, 500, "上传错误");
+        assert(!err, 500, "上传错误");
       }
       const file = req.file;
       const uploadConfig = req.app.get("uploadConfig");
@@ -55,15 +55,7 @@ module.exports = app => {
     let param = req.query || req.params;
     let code = param.code || "";
     let githubConfig = req.app.get("githubConfig");
-    if (code == "") {
-      res.end(
-        JSON.stringify({
-          msg: "你参数呢",
-          status: 103
-        })
-      );
-      return;
-    }
+    assert(code, 503, "参数缺失");
     request(
       {
         url: githubConfig.access_token_url,
@@ -75,7 +67,10 @@ module.exports = app => {
         }
       },
       (error, response, resbody) => {
-        if (!error && response.statusCode == 200) {
+        if (error) {
+          res.end(err);
+        }
+        if (response.statusCode == 200) {
           let urlStr = githubConfig.user_info_url + resbody;
           let bodyArr = {};
           for (let i = 0; i < resbody.split("&").length; i++) {
@@ -91,51 +86,190 @@ module.exports = app => {
               }
             },
             (error, response, resbody) => {
-              if (!error) {
-                let data = JSON.parse(resbody),
-                  role =
-                    data.login == githubConfig.github_ID ? "admin" : "guest";
-                const token = jwt.sign(
-                  { id: data.login, role: role },
-                  app.get("secret"),
-                  { expiresIn: 60 * 60 * 24 * 7 }
-                );
-                data.token = token;
-                data.login_way = "github";
-                res.end(
-                  JSON.stringify({
-                    msg: "sucess",
-                    status: 100,
-                    data: data
-                  })
-                );
-              } else {
-                res.end(JSON.stringify(error));
+              if (error) {
+                res.end(error);
               }
+              let data = JSON.parse(resbody),
+                role = data.login == githubConfig.github_ID ? "admin" : "guest";
+              const token = jwt.sign(
+                { id: data.login, role: role },
+                app.get("secret"),
+                { expiresIn: 60 * 60 * 24 * 7 }
+              );
+              data.token = token;
+              data.login_way = "github";
+              res.end(
+                JSON.stringify({
+                  msg: "sucess",
+                  status: 100,
+                  data: data
+                })
+              );
             }
           );
-        } else {
-          response.end(JSON.stringify(error));
         }
       }
     );
   });
-  //七牛云文件上传(给前端token)
+  //七牛云
   const qiniu = require("qiniu");
   const qiniuConfig = app.get("qiniuConfig");
-  app.post("/admin/api/upload/qiniu", async (req, res) => {
-    //鉴权对象
-    let mac = new qiniu.auth.digest.Mac(
-      qiniuConfig.accessKey,
-      qiniuConfig.secretKey
-    );
-    let putPolicy = new qiniu.rs.PutPolicy(qiniuConfig.options);
+  //鉴权对象
+  const mac = new qiniu.auth.digest.Mac(
+    qiniuConfig.accessKey,
+    qiniuConfig.secretKey
+  );
+  const cdnManager = new qiniu.cdn.CdnManager(mac);
+  const config = new qiniu.conf.Config();
+  config.zone = qiniu.zone.Zone_z2;
+  const bucketManager = new qiniu.rs.BucketManager(mac, config);
+  //七牛云文件上传(给前端token)
+  app.post("/admin/api/qiniu/upload", async (req, res) => {
+    let key = req.body.key || "";
+    const options = {
+      scope: `zhangxc-blog`,
+      saveKey:key,
+      expires: 7200,
+      insertOnly: 0,
+      returnBody: `{
+        "key":"$(key)",
+        "hash":"$(etag)",
+        "fsize":$(fsize),
+        "bucket":"$(bucket)",
+        "name":"$(x:name)",
+        "url":"https://cdn.zhangxc.cn/$(key)"
+      }`
+    };
+    let putPolicy = new qiniu.rs.PutPolicy(options);
     let uploadToken = await putPolicy.uploadToken(mac);
     res.end(
       JSON.stringify({
         uploadToken: uploadToken,
         status: 200
       })
+    );
+  });
+  //获取七牛云存储桶下文件列表
+  app.get("/admin/api/qiniu/bucket/list/:type", async (req, res) => {
+    let bucket = "zhangxc-blog",prefix=req.params.type||'';
+    if(prefix==="all"){
+      prefix = ''
+    }
+    let options = {
+      limit: 10000,
+      prefix: prefix
+    };
+    bucketManager.listPrefix(bucket, options, function(
+      err,
+      respBody,
+      respInfo
+    ) {
+      if (err) {
+        console.log(err);
+      } else {
+        if (respInfo.statusCode == 200) {
+          res.end(JSON.stringify(respBody));
+        } else {
+          res.end(
+            JSON.stringify({
+              status: respInfo.statusCode,
+              error: respBody.error
+            })
+          );
+        }
+      }
+    });
+  });
+  //获取七牛云存储桶下文件详情
+  app.get("/admin/api/qiniu/bucket/file:key", async (req, res) => {
+    let bucket = "zhangxc-blog";
+    let key = req.params.key || "";
+    bucketManager.stat(bucket, key, function(err, respBody, respInfo) {
+      if (err) {
+        console.log(err);
+      } else {
+        if (respInfo.statusCode == 200) {
+          res.end(JSON.stringify(respBody));
+        } else {
+          res.end(
+            JSON.stringify({
+              status: respInfo.statusCode,
+              error: respBody.error
+            })
+          );
+        }
+      }
+    });
+  });
+  //获取七牛云域名流量
+  app.get("/admin/api/qiniu/domain/flow", async (req, res) => {
+    let param = req.query || req.params;
+    console.log(param)
+    assert(param, 503, "参数错误");
+    //指定日期
+    let startDate = param.startDate || "2020-02-10";
+    let endDate = param.endDate || "2020-02-20";
+    let granularity = "day";
+    //获取域名流量
+    cdnManager.getFluxData(
+      startDate,
+      endDate,
+      granularity,
+      qiniuConfig.domains,
+      function(err, respBody, respInfo) {
+        if (err) {
+          res.end(err);
+        }
+        if (respInfo.statusCode == 200) {
+          let fluxData = respBody.data,
+            data = {};
+          qiniuConfig.domains.forEach(domain => {
+            let fluxDataOfDomain = fluxData[domain];
+            if (fluxDataOfDomain != null) {
+              data.fluxChina = fluxDataOfDomain["china"]?fluxDataOfDomain["china"]:[];
+              data.fluxOversea = fluxDataOfDomain["oversea"]?fluxDataOfDomain["oversea"]:[];
+            }
+          });
+          res.end(JSON.stringify(data));
+        } else {
+          res.end(JSON.stringify(respInfo));
+        }
+      }
+    );
+  });
+  //获取七牛云域名带宽
+  app.get("/admin/api/qiniu/domain/bandwidth", async (req, res) => {
+    let param = req.query || req.params;
+    assert(param, 503, "参数错误");
+    //指定日期
+    let startDate = param.startDate || "2020-02-10";
+    let endDate = param.endDate || "2020-02-20";
+    var granularity = "day";
+    //获取域名带宽
+    cdnManager.getBandwidthData(
+      startDate,
+      endDate,
+      granularity,
+      qiniuConfig.domains,
+      function(err, respBody, respInfo) {
+        if (err) {
+          res.end(err);
+        }
+        if (respInfo.statusCode == 200) {
+          let bandwidthData = respBody.data,
+            data = {};
+          qiniuConfig.domains.forEach(function(domain) {
+            let bandwidthDataOfDomain = bandwidthData[domain];
+            if (bandwidthDataOfDomain != null) {
+              data.bandwidthChina = bandwidthDataOfDomain["china"]?bandwidthDataOfDomain["china"]:[];
+              data.bandwidthOversea = bandwidthDataOfDomain["oversea"]?bandwidthDataOfDomain["oversea"]:[];
+            }
+          });
+          res.end(JSON.stringify(data));
+        } else {
+          res.end(JSON.stringify(respInfo));
+        }
+      }
     );
   });
   // 获取用户权限
@@ -165,15 +299,8 @@ module.exports = app => {
   });
   //根据GitHub用户id获取信息
   app.get("/admin/api/getUserInfo/github/:id", async (req, res) => {
-    if (!req.params.id) {
-      res.end(
-        JSON.stringify({
-          msg: "你参数呢",
-          status: 103
-        })
-      );
-    }
     let id = req.params.id;
+    assert(id, 503, "未能够正确获取用户id");
     let githubConfig = req.app.get("githubConfig");
     let url = `https://api.github.com/users/${id}`;
     request(
@@ -184,11 +311,8 @@ module.exports = app => {
         }
       },
       (err, response, resbody) => {
-        if (!err) {
-          res.send(JSON.parse(resbody));
-        } else {
-          res.end(JSON.stringify(err));
-        }
+        assert(!err, 503, err);
+        res.send(resbody);
       }
     );
   });

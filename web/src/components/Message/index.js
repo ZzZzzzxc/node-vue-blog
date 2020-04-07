@@ -13,7 +13,9 @@ Message.newInstance = properties => {
     }
   });
 
+  // 生成文档之外的的元素，因为不能直接挂载到body上
   const component = Instance.$mount();
+  // 手动挂载到body上
   document.body.appendChild(component.$el);
 
   const message = Instance.$children[0];

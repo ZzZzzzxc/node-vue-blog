@@ -1,5 +1,9 @@
 <script>
-import { getArticleDetail } from "../../services/index";
+import {
+  getArticleDetail,
+  getPrevArticle,
+  getNextArticle
+} from "../../services/index";
 import catalogTree from "../../components/catalogTree/index";
 import valineComment from "../../components/valineComment/index";
 import "../../style/article.less";
@@ -11,10 +15,14 @@ export default {
       dataJson: {
         tags: []
       },
-      titleOffsetTop: []
+      titleOffsetTop: [],
+      prevInfo: {},
+      nextInfo: {}
     };
   },
   created() {
+    this.getNext();
+    this.getPrev();
     getArticleDetail(this.$route.params.id)
       .then(res => {
         this.dataJson = res;
@@ -56,6 +64,34 @@ export default {
         zooms.style.visibility = "hidden";
         zooms.style.opacity = "0";
       });
+    },
+    getPrev() {
+      getPrevArticle(this.$route.params.id)
+        .then(res => {
+          if (res.length) {
+            this.prevInfo = res[0];
+          }
+        })
+        .catch(err => {
+          this.$Message.info({ content: err });
+        });
+    },
+    getNext() {
+      getNextArticle(this.$route.params.id)
+        .then(res => {
+          if (res.length) {
+            this.nextInfo = res[0];
+          }
+        })
+        .catch(err => {
+          this.$Message.info({ content: err });
+        });
+    },
+    toPrev() {
+      window.open(`https://blog.zhangxc.cn/article/${this.prevInfo._id}`);
+    },
+    toNext() {
+      window.open(`https://blog.zhangxc.cn/article/${this.nextInfo._id}`);
     }
   },
   render() {
@@ -91,6 +127,32 @@ export default {
             domPropsInnerHTML={this.dataJson.contextHtml}
             class="post_detail markdown-body"
           />
+          <div class="utils-line">
+            {this.prevInfo.title ? (
+              <div
+                onClick={() => {
+                  this.toPrev();
+                }}
+                class="prev"
+              >
+                上一篇：<span>{this.prevInfo.title}</span>
+              </div>
+            ) : (
+              <div class="prev">已经是第一篇了</div>
+            )}
+            {this.nextInfo.title ? (
+              <div
+                onClick={() => {
+                  this.toNext();
+                }}
+                class="next"
+              >
+                下一篇：<span>{this.nextInfo.title}</span>
+              </div>
+            ) : (
+              <div class="next">已经是最后一篇了</div>
+            )}
+          </div>
           <valineComment />
         </div>
         {Array.prototype.concat.apply([], this.dataJson.catalog).length > 0 ? (

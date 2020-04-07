@@ -5,7 +5,7 @@ module.exports = app => {
     filePath:
       baseConfig.mode == "dev"
         ? "http://localhost:3002/uploads/"
-        : "https://xxxx.com/uploads/",
+        : "https://admin.zhangxc.cn/uploads/",
     mimetype: {
       "image/png": "png",
       "image/jpeg": "jpg",

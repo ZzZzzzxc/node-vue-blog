@@ -17,11 +17,11 @@
     <div class="tip">
       <div v-if="isEnd">已经翻到底了/(ㄒoㄒ)/~~</div>
       <div v-if="loading">
-        正在拼命加载，请稍后...
+        <loading></loading>
       </div>
-      <div v-if="!isEnd&&!isloading">
+      <!-- <div v-if="!isEnd&&!isloading">
         滚动加载
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

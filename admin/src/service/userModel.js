@@ -2,7 +2,10 @@ import Axios from "../plugins/axios";
 
 export class UserModel {
   constructor() {}
-  //GitHub登录
+  /**
+   * GitHub登录
+   * @param req.code GitHub登录成功后获得的code
+   */
   loginByGithub(req) {
     return Axios.get("/github/login", { params: req });
   }
@@ -10,7 +13,10 @@ export class UserModel {
   getUserRole() {
     return Axios.get("/user");
   }
-  //获取Github用户信息
+  /**
+   * 获取Github用户信息
+   * @param id Github的用户id
+   */
   getUserInfoByGithub(id) {
     return Axios.get(`/getUserInfo/github/${id}`);
   }
@@ -18,13 +24,17 @@ export class UserModel {
   loginByGuest() {
     return Axios.get("/guest/login");
   }
-  //本站账户登录
+  /**
+   * 本站账户登录
+   * @param  req.username 用户名
+   * @param  req.password 密码
+   */
   loginByNoumenon(req) {
     return Axios.post("/noumenon/login", req);
   }
   //获取本站用户信息
-  getUserInfoByNoumenon(){
-    return Axios.get(`/getUserInfo/noumenon`)
+  getUserInfoByNoumenon() {
+    return Axios.get(`/getUserInfo/noumenon`);
   }
 }
 

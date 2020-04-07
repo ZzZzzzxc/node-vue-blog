@@ -1,4 +1,5 @@
 import axios from "axios";
+import router from "../router/index";
 import Vue from "vue";
 // axios配置
 axios.defaults.baseURL =
@@ -27,7 +28,10 @@ axios.interceptors.response.use(
   },
   async err => {
     if (err.response.data.message) {
-      Vue.prototype.$message.error(err.response.data.message);
+      // Vue.prototype.$message.error(err.response.data.message);
+      // if (err.response.status === 401) {
+      //   router.push("/login");
+      // }
     }
     return Promise.reject(err);
   }

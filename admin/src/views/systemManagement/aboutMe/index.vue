@@ -34,7 +34,8 @@ export default {
             this.getAboutMeById(this.id);
           }
         })
-        .catch(err => this.$message.error(err)).finally(()=>{
+        .catch(err => this.$message.error(err))
+        .finally(() => {
           this.loading = false;
         });
     },
@@ -107,7 +108,7 @@ export default {
       const formData = new FormData();
       formData.append("file", data.file);
       await aboutMes
-        .uploadByQiniu()
+        .uploadByQiniu({ key: data.file.type + "/" + data.file.name })
         .then(res => {
           console.log("成功获取token");
           formData.append("token", res.uploadToken);
@@ -135,13 +136,30 @@ export default {
     async imgAdd(pos, file) {
       const req = new FormData();
       req.append("file", file);
-      await aboutMes
-        .upload(req)
+    //   await aboutMes
+    //     .upload(req)
+    //     .then(res => {
+    //       this.$refs.md.$img2Url(pos, res.url);
+    //     })
+    //     .catch(err => {
+    //       this.$message.error(err);
+    //     });
+    // },
+    await article
+        .uploadByQiniu({ key: file.type + "/" + file.name })
         .then(res => {
-          this.$refs.md.$img2Url(pos, res.url);
+          console.log("成功获取token");
+          req.append("token", res.uploadToken);
+          this.$http.post("https://up-z2.qiniup.com/", req).then(res => {
+            this.$refs.md.$img2Url(pos, res.url);
+          });
         })
         .catch(err => {
           this.$message.error(err);
+          console.log("未能成功获取token");
+        })
+        .finally(() => {
+          this.uploading = false;
         });
     },
     download(value, render) {

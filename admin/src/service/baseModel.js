@@ -28,9 +28,12 @@ export class baseModel {
   upload(req) {
     return Axios.post("/upload", req);
   }
-  //文件上传(七牛)
-  uploadByQiniu() {
-    return Axios.post("/upload/qiniu");
+  /**
+   * 文件上传(七牛)
+   * @param  req.key 在存储桶内的名称
+   */
+  uploadByQiniu(req) {
+    return Axios.post("/qiniu/upload", req);
   }
 }
 

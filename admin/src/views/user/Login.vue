@@ -93,7 +93,7 @@ export default {
               }
             })
             .catch(err => {
-              this.$message.error("登录失败");
+              this.$message.error(err);
             });
         }
       });
@@ -121,11 +121,11 @@ export default {
                 path: "/"
               });
             } else {
-              this.$message.error("登录失败");
+              this.$message.error(err);
             }
           })
           .catch(err => {
-            this.$message.error("登录失败");
+            this.$message.error(err);
           })
           .finally(() => {
             this.loading = false;
@@ -146,7 +146,7 @@ export default {
           });
         })
         .catch(err => {
-          this.$message.error("登录失败");
+          this.$message.error(err);
         })
         .finally(() => {
           this.loading = false;

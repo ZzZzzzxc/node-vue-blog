@@ -30,9 +30,22 @@ export default {
         showTotal: total => `共有 ${total} 条数据`,
         showQuickJumper: true
       },
-      //url
-      resourceUrl: null,
-      uploading: false,
+      mp3: {
+        //歌曲文件
+        resourceUrl: null,
+        //歌曲上传中
+        uploading: false,
+        //进度
+        progress: -1
+      },
+      lrc: {
+        //歌词文件
+        resourceUrl: null,
+        //歌词上传中
+        uploading: false,
+        //进度
+        progress: -1
+      },
       //modal状态（新增 or 编辑）
       modalType: "create" || "edit"
     };
@@ -63,12 +76,14 @@ export default {
     //获取单条数据接口
     async getDataById(id) {
       let res = await musics.getById(id);
-      this.resourceUrl = res.url;
+      this.mp3.resourceUrl = res.url;
+      this.lrc.resourceUrl = res.lrc;
       this.form.setFieldsValue({
         _id: res._id,
         url: res.url,
         title: res.title,
-        singer: res.singer
+        singer: res.singer,
+        lrc: res.lrc
       });
     },
     //修改接口
@@ -106,7 +121,10 @@ export default {
     handleCancle() {
       this.visible = false;
       this.form.resetFields();
-      this.resourceUrl = null;
+      this.mp3.resourceUrl = null;
+      this.mp3.progress = -1;
+      this.lrc.resourceUrl = null;
+      this.lrc.progress = -1;
     },
     //删除按钮点击事件
     handleDelete(id) {
@@ -123,47 +141,92 @@ export default {
       this.fetchData({ key: req });
     },
     handleUpload(data) {
+      console.log(data);
       this.upload(data);
     },
     async upload(data) {
       const formData = new FormData();
       formData.append("file", data.file);
-      // const res = await musics.upload(formData);
+      let type = data.file.type ? data.file.type : "lrc";
       await musics
-        .uploadByQiniu(formData)
+        .uploadByQiniu({ key: type + "/" + data.file.name })
         .then(res => {
-          console.log('成功获取token')
+          if (type === "lrc") {
+            this.lrc.uploading = true;
+          } else {
+            this.mp3.uploading = true;
+          }
+          console.log("成功获取token");
           formData.append("token", res.uploadToken);
-          this.$http.post("https://up-z2.qiniup.com/", formData).then(res => {
-            this.resourceUrl = res.url;
-            this.form.setFieldsValue({
-              url: res.url
+          this.$http
+            .post("https://up-z2.qiniup.com/", formData, {
+              //获取上传进度
+              onUploadProgress: progressEvent => {
+                if (type === "lrc") {
+                  this.lrc.progress = parseInt(
+                    (
+                      (progressEvent.loaded / progressEvent.total) *
+                      100
+                    ).toFixed(0)
+                  );
+                } else {
+                  this.mp3.progress = parseInt(
+                    (
+                      (progressEvent.loaded / progressEvent.total) *
+                      100
+                    ).toFixed(0)
+                  );
+                }
+              }
+            })
+            .then(res => {
+              if (type === "lrc") {
+                this.lrc.resourceUrl = res.url;
+                this.form.setFieldsValue({
+                  lrc: res.url
+                });
+              } else {
+                this.mp3.resourceUrl = res.url;
+                this.form.setFieldsValue({
+                  url: res.url
+                });
+              }
             });
-          });
         })
-        .catch(err => { console.log('未能成功获取token')})
+        .catch(err => {
+          console.log("未能成功获取token");
+        })
         .finally(() => {
-          this.uploading = false;
+          if (type === "lrc") {
+            this.lrc.uploading = false;
+          } else {
+            this.mp3.uploading = false;
+          }
         });
-
-      // this.uploading = false;
-      // this.resourceUrl = res.url;
-      // this.form.setFieldsValue({
-      //   url: res.url
-      // });
     },
-    beforeUpload(file) {
-      this.uploading = true;
-      const isJPG = file.type === "audio/mp3";
-      if (!isJPG) {
+    beforeMp3Upload(file) {
+      const isMP3 = file.type === "audio/mp3";
+      if (!isMP3) {
         this.$message.error("请上传mp3文件");
       }
       const isLt2M = file.size / 1024 / 1024 < 30;
       if (!isLt2M) {
         this.$message.error("音频不能超过30M");
       }
-      this.uploading = false;
-      return isJPG && isLt2M;
+      return isMP3 && isLt2M;
+    },
+    beforeLrcUpload(file) {
+      // 没判断
+      const isLRC = file.type === "";
+      if (!isLRC) {
+        this.$message.error("请上传lrc文件");
+      }
+      const isLt2M = file.size / 1024 / 1024 < 3;
+      if (!isLt2M) {
+        this.$message.error("歌词不能超过3M");
+      }
+      return isLRC && isLt2M;
+      return true;
     },
     rendermodalForm() {
       return (
@@ -199,19 +262,66 @@ export default {
                   }
                 ]}
               >
-                {typeof this.resourceUrl == "string" ? (
-                  <div>{this.resourceUrl}</div>
+                {typeof this.mp3.resourceUrl == "string" ? (
+                  <div>{this.mp3.resourceUrl}</div>
+                ) : this.mp3.progress >= 0 ? (
+                  <div style="width:60%">
+                    <a-progress
+                      percent={this.mp3.progress}
+                      strokeColor={`{  
+                        "0%": "#108ee9",
+                        "100%": "#87d068"
+                      }`}
+                    />
+                  </div>
                 ) : (
                   <a-upload
                     customRequest={this.handleUpload}
                     multiple={false}
-                    beforeUpload={this.beforeUpload}
+                    beforeUpload={this.beforeMp3Upload}
                     showUploadList={false}
                     onChange={() => {}}
                   >
                     <a-button>
                       <a-icon type="upload" />
-                      Upload
+                      上传歌曲文件mp3
+                    </a-button>
+                  </a-upload>
+                )}
+              </div>
+            </a-form-item>
+            <a-form-item label="歌词文件lrc">
+              <div
+                v-decorator={[
+                  "lrc",
+                  {
+                    rules: [{ required: false }]
+                  }
+                ]}
+              >
+                {typeof this.lrc.resourceUrl == "string" ? (
+                  <div>{this.lrc.resourceUrl}</div>
+                ) : this.lrc.progress >= 0 ? (
+                  <div style="width:60%">
+                    <a-progress
+                      percent={this.lrc.progress}
+                      strokeColor={`{
+                        "0%": "#108ee9",
+                        "100%": "#87d068"
+                      }`}
+                    />
+                  </div>
+                ) : (
+                  <a-upload
+                    customRequest={this.handleUpload}
+                    multiple={false}
+                    beforeUpload={this.beforeLrcUpload}
+                    showUploadList={false}
+                    onChange={() => {}}
+                  >
+                    <a-button>
+                      <a-icon type="upload" />
+                      上传歌词lrc文件
                     </a-button>
                   </a-upload>
                 )}

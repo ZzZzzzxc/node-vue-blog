@@ -77,6 +77,29 @@
     article {
       margin: 0 auto;
       max-width: 56rem;
+      border-bottom: 1px dashed #b7b7b7;
+    }
+    .utils-line {
+      display: flex;
+      margin: 24px auto;
+      max-width: 56rem;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      .prev,
+      .next {
+        font-size: 16px;
+        height: 26px;
+        line-height: 26px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        padding: 0 1em;
+        transition: 0.3s;
+        border-bottom: solid #ffac5a;
+        &:hover {
+          color: #ffac5a;
+        }
+      }
     }
   }
 }

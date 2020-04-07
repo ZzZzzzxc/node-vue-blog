@@ -1,19 +1,9 @@
 module.exports = app => {
   const qiniuConfig = {
-    accessKey: "your accessKey",
-    secretKey: "your secretKey",
-    options: {
-      scope: "your scope",
-      // expires: 7200,
-      returnBody: `{
-        "key":"$(key)",
-        "hash":"$(etag)",
-        "fsize":$(fsize),
-        "bucket":"$(bucket)",
-        "name":"$(x:name)",
-        "url":"http://xxx.com/$(key)"
-      }`
-    }
+    accessKey: "DkyGk1V0MT92ziMg7RsPECEhhKcdcYmjAWMh5Wc7",
+    secretKey: "wAXNcP9cYO1qdJy60VG7CCaOwI6HCcM-dQw2RUPA",
+    domains: ["cdn.zhangxc.cn"],
+    bucket:"cdn.zhangxc.cn"
   };
   app.set("qiniuConfig", qiniuConfig);
 };

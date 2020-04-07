@@ -8,6 +8,7 @@ module.exports = app => {
   const FriendLink = mongoose.model("FriendLink");
   const Tag = mongoose.model("Tag");
   const Music = mongoose.model("Music");
+  const Logo = mongoose.model("Logo");
   const request = require("request");
   const timeout = require("../../middleware/timeout");
   //文章列表
@@ -83,6 +84,45 @@ module.exports = app => {
   //歌曲列表
   router.get("/music/list", async (req, res) => {
     const data = await Music.find();
+    res.send(data);
+  });
+  //Logo
+  router.get("/logo", async (req, res) => {
+    const data = await Logo.find();
+    res.send(data);
+  });
+  //上一篇
+  router.get("/article/prev/:id", async (req, res) => {
+    const data = await Article.find(
+      { _id: { $lt: req.params.id } },
+      { context: 0, contextHtml: 0, catalog: 0 }
+    )
+      .sort({ _id: -1 })
+      .limit(1);
+    res.send(data);
+  });
+  //下一篇
+  router.get("/article/next/:id", async (req, res) => {
+    const data = await Article.find(
+      { _id: { $gt: req.params.id } },
+      { context: 0, contextHtml: 0, catalog: 0 }
+    )
+      .sort({ _id: -1 })
+      .limit(1);
+    res.send(data);
+  });
+  //根据时间段查询文章
+  router.get("/timeline/:year", async (req, res) => {
+    let cur = req.params.year;
+    const data = await Article.find(
+      {
+        $and: [
+          { created: { $gt: `${cur - 1}-01-01 0:0:0` } },
+          { created: { $lt: `${cur}-12-31 0:0:0` } }
+        ]
+      },
+      { context: 0, contextHtml: 0, catalog: 0 }
+    ).sort({ created: -1 });
     res.send(data);
   });
   // 错误处理函数

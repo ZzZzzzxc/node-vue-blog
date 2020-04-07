@@ -5,9 +5,11 @@ const schema = new mongoose.Schema(
     //歌名
     title: { type: String },
     //歌手名
-    singer: { type: String},
+    singer: { type: String },
     //url
-    url: { type: String }
+    url: { type: String },
+    //歌词
+    lrc: { type: String }
   },
   { timestamps: { createdAt: "created", updatedAt: "updated" } }
 );

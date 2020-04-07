@@ -20,6 +20,8 @@ export default {
       //表单图片
       imageUrl: "",
       uploading: false,
+      //图片上传进度
+      progress: -1,
       //文章
       imgFileList: [],
       contextHtml: "",
@@ -118,16 +120,27 @@ export default {
       const formData = new FormData();
       formData.append("file", data.file);
       await article
-        .uploadByQiniu()
+        .uploadByQiniu({ key: data.file.type + "/" + data.file.name })
         .then(res => {
           console.log("成功获取token");
           formData.append("token", res.uploadToken);
-          this.$http.post("https://up-z2.qiniup.com/", formData).then(res => {
-            this.imageUrl = res.url;
-            this.form.setFieldsValue({
-              banner: res.url
+          this.$http
+            .post("https://up-z2.qiniup.com/", formData, {
+              //获取上传进度
+              onUploadProgress: progressEvent => {
+                this.progress = parseInt(
+                  ((progressEvent.loaded / progressEvent.total) * 100).toFixed(
+                    0
+                  )
+                );
+              }
+            })
+            .then(res => {
+              this.imageUrl = res.url;
+              this.form.setFieldsValue({
+                banner: res.url
+              });
             });
-          });
         })
         .catch(err => {
           console.log("未能成功获取token");
@@ -155,7 +168,7 @@ export default {
       //     this.$message.error(err);
       //   });
       await article
-        .uploadByQiniu()
+        .uploadByQiniu({ key: file.type + "/" + file.name })
         .then(res => {
           console.log("成功获取token");
           req.append("token", res.uploadToken);
@@ -206,10 +219,7 @@ export default {
           ]}
         >
           {this.imageUrl ? (
-            <img
-              src={this.imageUrl}
-              style={"max-height:100%"}
-            ></img>
+            <img src={this.imageUrl} style={"max-height:100%"}></img>
           ) : (
             <div style={"width:100%;height:100%;position:relative;"}>
               <div
@@ -228,6 +238,17 @@ export default {
                 )}
                 <div>Logo</div>
               </div>
+              {this.progress >= 0 ? (
+                <a-progress
+                  percent={this.progress}
+                  strokeColor={`{  
+                        "0%": "#108ee9",
+                        "100%": "#87d068"
+                      }`}
+                />
+              ) : (
+                <div />
+              )}
             </div>
           )}
         </a-upload>

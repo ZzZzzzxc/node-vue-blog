@@ -1,5 +1,5 @@
 <script>
-import { getNavList } from "../../services/index";
+import { getNavList, getLogo } from "../../services/index";
 import "../../style/nav.less";
 export default {
   name: "header-nav",
@@ -16,7 +16,8 @@ export default {
       isVisible: false,
       //侧栏是否打开
       isSlideShow: false,
-      current: ""
+      current: "",
+      logo: {}
     };
   },
   watch: {
@@ -67,6 +68,13 @@ export default {
         .catch(err => {
           this.$Message.info({ content: err });
         });
+      getLogo()
+        .then(res => {
+          this.logo = res[res.length-1];
+        })
+        .catch(err => {
+          this.$Message.info({ content: err });
+        });
     },
     toPage(data) {
       this.current = data.path;
@@ -99,9 +107,11 @@ export default {
       <div>
         <header id="nav-body" ref="nav">
           <div class="container">
-            <div id="logo">Logo</div>
+            <div id="logo">{
+              this.logo.isUse&&this.logo.banner?<img src={this.logo.banner} />:this.logo.title
+            }</div>
             <span id="open-btn" onClick={() => this.switch()}>
-              {this.isSlideShow ? "close" : "open"}
+              {this.isSlideShow ? "" : <svg-icon iconClass="list" />}
             </span>
             <ul id="nav-menu">
               {this.isVisible ? (

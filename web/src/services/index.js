@@ -40,3 +40,23 @@ export async function getMusicList() {
   let res = await Api.fetchMusicList();
   return res;
 }
+//Logo
+export async function getLogo() {
+  let res = await Api.fetchLogo();
+  return res;
+}
+//上一篇
+export async function getPrevArticle(id) {
+  let res = await Api.fetchPrevArticle(id);
+  return res;
+}
+//下一篇
+export async function getNextArticle(id) {
+  let res = await Api.fetchNextArticle(id);
+  return res;
+}
+//根据年份查询文章
+export async function getArticlesByYear(year) {
+  let res = await Api.fetchArticlesByYear(year);
+  return res;
+}

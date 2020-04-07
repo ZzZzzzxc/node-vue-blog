@@ -3,7 +3,7 @@ export default function(router) {
     path: "/music",
     name: "music",
     component: { render: h => h("router-view") },
-    meta: { icon: "cloud-upload", title: "音乐管理", authority: ["admin"] },
+    meta: { icon: "cloud-upload", title: "音乐管理", authority: ["guest","admin"] },
     children: [
       {
         path: "/music/list",
@@ -11,7 +11,7 @@ export default function(router) {
         meta: {
           icon: "cloud-download",
           title: "音乐列表",
-          authority: ["guest", "admin"]
+          authority: ["guest","admin"]
         },
         component: () =>
           import(

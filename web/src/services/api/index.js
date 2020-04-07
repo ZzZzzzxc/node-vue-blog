@@ -30,7 +30,23 @@ export default {
     return Axios.get("/tag/" + id);
   },
   //获取歌曲列表
-  fetchMusicList(id) {
+  fetchMusicList() {
     return Axios.get("/music/list");
+  },
+  //获取Logo
+  fetchLogo() {
+    return Axios.get("/logo");
+  },
+  //上一篇
+  fetchPrevArticle(id) {
+    return Axios.get(`/article/prev/${id}`);
+  },
+  //下一篇
+  fetchNextArticle(id) {
+    return Axios.get(`/article/next/${id}`);
+  },
+  //根据年份查询文章
+  fetchArticlesByYear(year) {
+    return Axios.get(`/timeline/${year}`);
   }
 };
