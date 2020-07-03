@@ -13,6 +13,8 @@ npm i
 npm run serve
 ```
 
+管理系统建议用 [https://github.com/ZzZzzzxc/vue2-admin](https://github.com/ZzZzzzxc/vue2-admin) ，现在这个写的不太行，不好维护。。。
+
 [博客端](https://blog.zhangxc.cn/home)
 
 ```js
