@@ -14,7 +14,7 @@
     "leancloud-storage": "^4.2.0",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "path": "^0.12.7",
